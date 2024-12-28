@@ -122,56 +122,68 @@ typedef char endCheck[(PARAM_E_FLASH_END < 1023) ? 0 : -1];
 static bool
 param_check(__pdata enum ParamID id, __data uint32_t val)
 {
-	// parameter value out of range - fail
-	if (id >= PARAM_MAX)
-		return false;
+    if (id >= PARAM_MAX) {
+        return false;
+    }
 
-	switch (id) {
-	case PARAM_FORMAT:
-		return false;
+    // PARAM_FORMAT
+    if (id == PARAM_FORMAT) {
+        return false;
+    }
 
-	case PARAM_SERIAL_SPEED:
-		return serial_device_valid_speed(val);
+    // PARAM_SERIAL_SPEED
+    if (id == PARAM_SERIAL_SPEED) {
+        return serial_device_valid_speed(val);
+    }
 
-	case PARAM_AIR_SPEED:
-		if (val > 256)
-			return false;
-		break;
+    // PARAM_AIR_SPEED
+    if (id == PARAM_AIR_SPEED) {
+        if (val > 256) {
+            return false;
+        }
+        return true;
+    }
 
-	case PARAM_NETID:
-		// all values are OK
-		return true;
+    // PARAM_NETID
+    if (id == PARAM_NETID) {
+        // all values are OK
+        return true;
+    }
 
-	case PARAM_TXPOWER:
-		if (val > BOARD_MAXTXPOWER)
-			return false;
-		break;
+    // PARAM_TXPOWER
+    if (id == PARAM_TXPOWER) {
+        if (val > BOARD_MAXTXPOWER) {
+            return false;
+        }
+        return true;
+    }
 
-	case PARAM_ECC:
-	case PARAM_OPPRESEND:
-		// boolean 0/1 only
-		if (val > 1)
-			return false;
-		break;
+    // PARAM_ECC or PARAM_OPPRESEND
+    if (id == PARAM_ECC || id == PARAM_OPPRESEND) {
+        if (val > 1) {
+            return false;
+        }
+        return true;
+    }
 
-	case PARAM_MAVLINK:
-		if (val > 2)
-			return false;
-		break;
+    // PARAM_MAVLINK
+    if (id == PARAM_MAVLINK) {
+        if (val > 2) {
+            return false;
+        }
+        return true;
+    }
 
-	case PARAM_MAX_WINDOW:
-		// 131 milliseconds == 0x1FFF 16 usec ticks,
-		// which is the maximum we can handle with a 13
-		// bit trailer for window remaining
-		if (val > 131)
-			return false;
-		break;
+    // PARAM_MAX_WINDOW
+    if (id == PARAM_MAX_WINDOW) {
+        if (val > 131) {
+            return false;
+        }
+        return true;
+    }
 
-	default:
-		// no sanity check for this value
-		break;
-	}
-	return true;
+    // default / no special checks
+    return true;
 }
 
 bool
@@ -280,7 +292,7 @@ __critical {
 	
 	// decide whether we read a supported version of the structure
 	if (param_get(PARAM_FORMAT) != PARAM_FORMAT_CURRENT) {
-		debug("parameter format %lu expecting %lu", parameters[PARAM_FORMAT], PARAM_FORMAT_CURRENT);
+		//debug("parameter format %lu expecting %lu", parameters[PARAM_FORMAT], PARAM_FORMAT_CURRENT);
 		return false;
 	}
 
