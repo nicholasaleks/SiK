@@ -70,7 +70,7 @@ __code const struct parameter_info {
 	{"MANCHESTER",      0},
 	{"RTSCTS",          0},
 	{"MAX_WINDOW",    131},
-	{"W00F_SCAN",       0}, // SiKW00f Scan Default to disabled (0)
+	{"PROMISCUOUS_MODE",       0}, // SiKW00f Scan Default to disabled (0)
 #ifdef INCLUDE_AES
 	{"ENCRYPTION_LEVEL", 0}, // no Enycryption (0), 128 or 256 bit key
 #endif
@@ -176,7 +176,7 @@ param_check(__pdata enum ParamID id, __data uint32_t val)
     }
 
 	// SiKW00f Scan Param Checking
-	if (id == PARAM_W00F_SCAN) {
+	if (id == PARAM_PROMISCUOUS_MODE) {
 		if (val > 1) {
 			return false;
 		}
@@ -233,7 +233,7 @@ param_set(__data enum ParamID param, __pdata param_t value)
 	case PARAM_OPPRESEND:
 		break;
 
-	case PARAM_W00F_SCAN:
+	case PARAM_PROMISCUOUS_MODE:
 		feature_w00f_scan = (uint8_t)value;
 		value = feature_w00f_scan;
 		break;

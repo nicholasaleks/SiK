@@ -125,7 +125,7 @@ main(void)
 	feature_mavlink_framing = param_get(PARAM_MAVLINK);
 	feature_golay = param_get(PARAM_ECC)?true:false;
 	feature_rtscts = param_get(PARAM_RTSCTS)?true:false;
-	feature_w00f_scan = param_get(PARAM_W00F_SCAN)?true:false;;
+	feature_w00f_scan = param_get(PARAM_PROMISCUOUS_MODE)?true:false;;
 
 	// Do hardware initialisation.
 	hardware_init();
