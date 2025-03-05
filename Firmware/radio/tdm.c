@@ -247,6 +247,12 @@ sync_tx_windows(__pdata uint8_t packet_length)
   } else {
     // we are in the other radios transmit window, our
     // receive window
+
+    if(old_state == TDM_TRANSMIT){
+      tdm_state_remaining = trailer.window;
+      return;
+    }
+
     tdm_state = TDM_RECEIVE;
     tdm_state_remaining = trailer.window;
   }
@@ -767,22 +773,22 @@ tdm_serial_loop(void)
     trailer.bonus = (tdm_state == TDM_RECEIVE);
     trailer.resend = packet_is_resend();
     
-    if (tdm_state == TDM_TRANSMIT &&
-            len == 0 &&
-            send_statistics &&
-            max_xmit >= sizeof(statistics)) {
-      // send a statistics packet
-      send_statistics = 0;
-      memcpy(pbuf, &statistics, sizeof(statistics));
-      len = sizeof(statistics);
+    // if (tdm_state == TDM_TRANSMIT &&
+    //         len == 0 &&
+    //         send_statistics &&
+    //         max_xmit >= sizeof(statistics)) {
+    //   // send a statistics packet
+    //   send_statistics = 0;
+    //   memcpy(pbuf, &statistics, sizeof(statistics));
+    //   len = sizeof(statistics);
       
-      // mark a stats packet with a zero window
-      trailer.window = 0;
-      trailer.resend = 0;
-    } else {
-      // calculate the control word as the number of
-      // 16usec ticks that will be left in this
-      // tdm state after this packet is transmitted
+    //   // mark a stats packet with a zero window
+    //   trailer.window = 0;
+    //   trailer.resend = 0;
+    // } else {
+    //   // calculate the control word as the number of
+    //   // 16usec ticks that will be left in this
+    //   // tdm state after this packet is transmitted
       
 #ifdef INCLUDE_AES
       if (aes_get_encryption_level() > 0) {
@@ -794,7 +800,7 @@ tdm_serial_loop(void)
 #else // INCLUDE_AES
       trailer.window = (uint16_t)(tdm_state_remaining - flight_time_estimate(len+sizeof(trailer)));
 #endif // INCLUDE_AES
-    }
+    //}
     
     // set right transmit channel
     radio_set_channel(fhop_transmit_channel());

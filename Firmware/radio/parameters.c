@@ -70,6 +70,7 @@ __code const struct parameter_info {
 	{"MANCHESTER",      0},
 	{"RTSCTS",          0},
 	{"MAX_WINDOW",    131},
+	{"W00F_SCAN",       0}, // SiKW00f Scan Default to disabled (0)
 #ifdef INCLUDE_AES
 	{"ENCRYPTION_LEVEL", 0}, // no Enycryption (0), 128 or 256 bit key
 #endif
@@ -174,6 +175,14 @@ param_check(__pdata enum ParamID id, __data uint32_t val)
         return true;
     }
 
+	// SiKW00f Scan Param Checking
+	if (id == PARAM_W00F_SCAN) {
+		if (val > 1) {
+			return false;
+		}
+		return true;
+	}
+
     // PARAM_MAX_WINDOW
     if (id == PARAM_MAX_WINDOW) {
         if (val > 131) {
@@ -222,6 +231,11 @@ param_set(__data enum ParamID param, __pdata param_t value)
 		break;
 
 	case PARAM_OPPRESEND:
+		break;
+
+	case PARAM_W00F_SCAN:
+		feature_w00f_scan = (uint8_t)value;
+		value = feature_w00f_scan;
 		break;
 
 	case PARAM_RTSCTS:

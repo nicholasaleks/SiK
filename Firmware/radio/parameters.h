@@ -62,6 +62,7 @@ enum ParamID {
 	PARAM_MANCHESTER,		// enable manchester encoding
 	PARAM_RTSCTS,			// enable hardware flow control
 	PARAM_MAX_WINDOW,		// The maximum window size allowed
+	PARAM_W00F_SCAN,        // enable SiKW00f Scanning
 #ifdef INCLUDE_AES
   PARAM_ENCRYPTION,     // no Enycryption (0), 128 or 256 bit key
 #endif
@@ -125,6 +126,8 @@ extern void param_save(void);
 /// Note that this just resets - it does not save.
 ///
 extern void param_default(void);
+
+extern __pdata uint8_t feature_w00f_scan;
 
 /// convenient routine to constrain parameter values
 uint32_t constrain(__pdata uint32_t v, __pdata uint32_t min, __pdata uint32_t max);
