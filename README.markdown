@@ -1,6 +1,21 @@
-SiK
-=====
-Firmware for SiLabs Si1000 - Si102x/3x/6x ISM radios
+SiK (+Promiscuous Mode)
+=======================
+Customized Firmware for Offensive Security Testing using the SiLabs Si1000 - Si102x/3x/6x ISM radios. Used to support the [SiKW00F](https://github.com/nicholasaleks/sikw00f) the Drone SiK Radio Detection & MAVLink Telemetry Eavesdropping Toolkit.
+
+# Custom Attacker Firmware Modifications
+
+## NetID Header Control Bypasses
+
+To enable promiscuous scanning, a dynamic modification is made in the key register of the Si443x transceiver used by SiK radios: HEADER_CONTROL_1 using `S16 S16:Promiscous_Mode`. By default, this register is set so that incoming packets’ NetIDs must match the radio’s own NetID (the hardware filtering step). The custom firmware changes HEADER_CONTROL_1 to 0x00 when `S16 S16:Promiscous_Mode=1`, effectively disabling that hardware filtering. Once filtering is off, the radio forwards all packets to the firmware instead of ignoring those with different NetIDs.
+
+## Silence Statistics Frames
+
+By default, SiK radios periodically send “statistics frames”—packets containing link status, error counts, and other telemetry data to help manage and optimize the time division multiplexing (TDM) link. In the attacker firmware, these frames are deliberately never transmitted. This prevents the drone or GCS from suspecting there is an extra participant on the network. All code paths that would queue, compose, or send these statistic frames have been removed or bypassed. As a result, the attacker radio remains “invisible” from the standpoint of normal network diagnostics and keeps a minimal footprint on the air, staying stealthy while passively receiving.
+
+## State Machine Synchronization
+
+To seamlessly intercept telemetry, the attacker radio must still follow the same time division multiplexing (TDM) scheduling as the legitimate drone and Ground Control Station. Accordingly, the firmware’s TDM state machine has been extended with extra logic to listen for and interpret timing cues—channel hops, sync intervals, or packet spacing—without ever sending control frames. This ensures the attacker radio advances through the TDM timeline in lockstep with the legitimate radios, even though it does not advertise itself or engage in the normal handshake. By mirroring the network’s hopping pattern and timing, the attacker can capture valid packets on each channel while remaining entirely passive from the perspective of the drone and GCS.
+
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ArduPilot/SiK?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -24,7 +39,6 @@ Currently, it supports the following boards:
 Adding support for additional boards should not be difficult.
 
 Currently the firmware components include:
-
  - A bootloader with support for firmware upgrades over the serial interface.
  - Radio firmware with support for parsing AT commands, storing parameters and FHSS/TDM functionality
 
@@ -55,6 +69,29 @@ Currently the firmware components include:
 |ATZ | | Generate a software reset    |
 
 Up to date AT command processig is located in [at.c](Firmware/radio/at.c) source code.
+
+### ATS EEPROM Parameters
+
+|Param| Default Value| Description |
+|-------|--------|----------|
+|S0:Format| 32 | EEPROM Format version|
+|S1:SERIAL_SPPED | 57 | Serial Spped in one byte form |
+|S2:AIR_SPEED | 64 |  Air Data Rate in one byte form |
+|S3:NETID | 25 | Network ID used to sync radio pairs, or trios ;) | 
+|S4:TXPOWER | 20 | Transmit Power in dBm, max is 20dBM |
+|S5:ECC | 0 | Enables/Disables the golay error correcting code |
+|S6:MAVLINK | 1 | Controls MAVLink framing and reporting. 0=no MAVLink framing, 1=frame mavlink, 2=low latency mavlink |
+|S7:OPPRESEND | 0 | Resend dropped packets | 
+|S8:MIN_FREQ | 915000 or 433050 | Minimum frequency in kHz |
+|S9:MAX_FREQ | 928000 or 434790 | Maximum frequency in kHz |
+|S10:NUM_CHANNELS | 50 or 10 | Number of frequency hopping channels |
+|S11:DUTY_CYCLE | 100 | Percentage of time to allow transmit |
+|S12:LBT_RSSI | 0 | Listen Before Talk threshold |
+|S13:MANCHESTER | 0 |  |
+|S14:RTSCTS | 0 |  |
+|S15:MAX_WINDOW | 131 | Max Transmit window in msecs |
+|S16:PROMISCUOUS_MODE | 0 | Enables/Disables the passive monitoring and collection of SiK radios |
+
 
 ## What You Will Need
 
