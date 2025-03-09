@@ -95,9 +95,9 @@ static void	clear_status_registers(void);
 
 static void display_netid(void)
 {
-    if (at_mode_active) {
-        return;  // Skip execution if in `+++` mode
-    }
+    // if (at_mode_active) {
+    //     return;  // Skip execution if in `+++` mode
+    // }
 
     __xdata uint8_t hdr_high, hdr_low;
     __xdata uint16_t netid_val;

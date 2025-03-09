@@ -8,6 +8,10 @@ Customized Firmware for Offensive Security Testing using the SiLabs Si1000 - Si1
 
 To enable promiscuous scanning, a dynamic modification is made in the key register of the Si443x transceiver used by SiK radios: HEADER_CONTROL_1 using `S16 S16:Promiscous_Mode`. By default, this register is set so that incoming packets’ NetIDs must match the radio’s own NetID (the hardware filtering step). The custom firmware changes HEADER_CONTROL_1 to 0x00 when `S16 S16:Promiscous_Mode=1`, effectively disabling that hardware filtering. Once filtering is off, the radio forwards all packets to the firmware instead of ignoring those with different NetIDs.
 
+## Real-Time NetID Overwrite
+
+To support rapid enumeration scanning, immediate application of a new NetID to the radio hardware bypasses the standard requirement for an explicit EEPROM save-and-reboot cycle. This modification enables an attacker’s SiK firmware to dynamically switch to any targeted network identifier on the fly, letting the transceiver swiftly pivot among drone telemetry links without alerting legitimate participants or requiring a full restart.
+
 ## Silence Statistics Frames
 
 By default, SiK radios periodically send “statistics frames”—packets containing link status, error counts, and other telemetry data to help manage and optimize the time division multiplexing (TDM) link. In the attacker firmware, these frames are deliberately never transmitted. This prevents the drone or GCS from suspecting there is an extra participant on the network. All code paths that would queue, compose, or send these statistic frames have been removed or bypassed. As a result, the attacker radio remains “invisible” from the standpoint of normal network diagnostics and keeps a minimal footprint on the air, staying stealthy while passively receiving.
