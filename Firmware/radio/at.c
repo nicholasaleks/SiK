@@ -358,39 +358,44 @@ at_i(void)
   }
 }
 
-static void
-at_s(void)
-{
-	__pdata uint8_t		sreg;
+static void at_s(void) {
+    __pdata uint8_t sreg;
 
-	// get the register number first
-	idx = 3;
-	at_parse_number();
-	sreg = at_num;
-	// validate the selected sreg
-	if (sreg >= PARAM_MAX) {
-		at_error();
-		return;
-	}
+    idx = 3;
+    at_parse_number();
+    sreg = at_num;
 
-	switch (at_cmd[idx]) {
-	case '?':
-		at_num = param_get(sreg);
-		printf("%lu\n", at_num);
-		return;
+    if (sreg >= PARAM_MAX) {
+        at_error();
+        return;
+    }
 
-	case '=':
-		if (sreg > 0) {
-			idx++;
-			at_parse_number();
-			if (param_set(sreg, at_num)) {
-				at_ok();
-				return;
-			}
-		}
-		break;
-	}
-	at_error();
+    switch (at_cmd[idx]) {
+    case '?':
+        at_num = param_get(sreg);
+        printf("%lu\n", at_num);
+        return;
+
+    case '=':
+        if (sreg > 0) {
+            idx++;
+            at_parse_number();
+
+            if (sreg == PARAM_NETID) {
+                param_set(sreg, at_num);
+                radio_set_network_id(at_num); // Apply NETID immediately
+                at_ok();
+                return;
+            }
+
+            if (param_set(sreg, at_num)) {
+                at_ok();
+                return;
+            }
+        }
+        break;
+    }
+    at_error();
 }
 
 static void
