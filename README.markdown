@@ -102,7 +102,7 @@ Up to date AT command processig is located in [at.c](Firmware/radio/at.c) source
  - A Mac OS X or Linux system for building.  Mac users will need the Developer Tools (Xcode) installed.
  - At least two Si1000 - Si102x/3x - based radio devices (just one radio by itself is not very useful).
  - A [SiLabs USB debug adapter](http://www.silabs.com/products/mcu/Pages/USBDebug.aspx).
- - [SDCC](http://sdcc.sourceforge.net/), version 3.1.0 or later.
+ - [SDCC](http://sdcc.sourceforge.net/), version 4.4.0 (4.5 does not work).
  - [EC2Tools](https://github.com/SamwelOpiyo/ec2)
  - [Mono](http://www.mono-project.com/) to build and run the GUI firmware updater.
  - Python to run the command-line firmware updater.
